@@ -1,0 +1,55 @@
+> Design modification
+
+This design implements in depth implementation of trade matching scenarios (trying to mimic the real time to
+some extent),  there can be a simpler version without the MatchingEngine, where we directly buy and sell the stock
+from the Exchange
+
+> Flow of the app
+
+Investor → Broker → StockExchange → OrderProcessor
+            ↓                      ↓
+         (placeOrder)          MatchingEngine → (findMatch)
+                                    ↓
+                      match found? Yes → OrderProcessor → executeTrade
+                                      → update balances, portfolios
+                             No  → OrderBook → store for future match
+
+> Why there is no stockVsQuantity mapping at the StockExchange
+
+In real world there is no fixed quantity on a exchange its the concurrent
+buying and selling which makes the volume keep going.
+
+So instead, have implemented stockVsPrice (mocked price as fixed, as we are not simulating
+any real buy sell txn)
+
+> To mimic the exact multi leg txn (where one buy order can be fulfilled with multiple sell order and vice-versa)
+
+Conceptual Changes Needed:
+1. Support Partial Fill in Orders
+Add remainingQuantity or filledQuantity in Order
+
+Update it as each match happens
+
+Track OrderStatus: PARTIALLY_EXECUTED, EXECUTED, PENDING
+
+2. MatchingEngine Loop
+Instead of stopping at first match, keep polling the sell orders as long as:
+
+sell.price <= buy.price
+
+remainingQuantity > 0
+
+Match as much as possible in each round
+
+3. Execute Trades in Multiple Legs
+Each matched leg is an individual trade
+
+Update both buyer/seller portfolio & balance proportionally
+
+4. Leave Remaining Orders Back in Book
+Unmatched portion of sell order (like S2’s remaining 5 shares) is kept in book
+
+Unmatched buy quantity (if any) may also remain or be cancelled
+
+
+> Also we can add the validity for which current order should be valid (like for a day or month)

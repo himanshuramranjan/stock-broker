@@ -1,0 +1,127 @@
+@startuml
+
+class Broker {
+    - static List<StockExchange> exchanges
+    - static List<Investor> investors
+    - static String brokerName = "ZERODHA"
+    + static void addExchanges(List<String> exchangesName)
+    + static void addExchange(StockExchange exchange)
+    + static void addInvestors(Investor investor)
+    + static void removeInvestor(Investor investor)
+    + static void placeOrder(Investor investor, Order order, String exchange)
+}
+
+class Investor {
+    - String userId
+    - double totalBalance
+    - String userName
+    - String email
+    - Portfolio portfolio
+    + Investor(String userId, double totalBalance, String userName, String email)
+    + void updateBalance(double balance)
+    + void placeOrder(OrderType type, Stock stock, int quantity, Double price, String exchange)
+    + Portfolio getPortfolio()
+    + String getUserName(), getEmail()
+    + void setUserName(String userName), setEmail(String email)
+    + double getTotalBalance()
+}
+
+class Portfolio {
+    - String investorId
+    - Map<Stock, Integer> holdings
+    + void addStock(Stock stock, int quantity)
+    + boolean removeStock(Stock stock, int quantity)
+    + void displayPortfolio()
+}
+
+class Stock {
+    - String symbol
+    - String companyName
+    - double currentPrice
+    + Stock(String symbol, String companyName, double currentPrice)
+    + String getSymbol(), getCompanyName()
+    + void setCompanyName(String companyName)
+    + double getCurrentPrice(), void setCurrentPrice(double currentPrice)
+    + boolean equals(Object o), int hashCode()
+}
+
+class Order {
+    - static AtomicInteger counter
+    - final String orderId
+    - OrderType orderType
+    - Stock stock
+    - int quantity
+    - Double price
+    - OrderStatus orderStatus
+    - LocalDateTime orderTime
+    - Investor investor
+    + Order(Investor investor, OrderType orderType, Stock stock, int quantity, Double price)
+    + void setQuantity(int quantity), setPrice(Double price)
+    + void setOrderStatus(OrderStatus status), setOrderType(OrderType)
+    + String getOrderId()
+    + Stock getStock(), int getQuantity(), Double getPrice()
+    + OrderType getOrderType(), OrderStatus getOrderStatus()
+    + LocalDateTime getOrderTime()
+    + Investor getInvestor()
+}
+
+class OrderBook {
+    - static Map<String, OrderBook> stockOrderBook
+    - PriorityQueue<Order> buyOrder
+    - PriorityQueue<Order> sellOrder
+    + static OrderBook getOrderBook(Stock stock)
+    + void addOrder(Order order)
+    + PriorityQueue<Order> getBuyOrder(), getSellOrder()
+}
+
+class OrderProcessor {
+    - static volatile OrderProcessor orderProcessor
+    + static OrderProcessor getInstance()
+    + void processOrder(Order order, Investor investor)
+    - void executeTrade(Trade trade) throws InsufficientStockException, InsufficientFundsException
+    - void validateStock(Investor, Stock, int, Order)
+    - void validateFund(Investor, double, Order)
+}
+
+class TradeMatchingEngine {
+    - static final TradeMatchingEngine ENGINE
+    + static TradeMatchingEngine getInstance()
+    + Trade findMatch(Order order, Investor investor, OrderBook book)
+    - Trade findExactQuantityMatch(Order, Investor, PriorityQueue<Order>, BiPredicate<Order, Order>)
+    - PriorityQueue<Order> getOppositeOrders(Order, OrderBook)
+    - BiPredicate<Order, Order> getPriceMatcherForOrderType(OrderType)
+    - Trade buildTrade(Order, Order, Investor)
+    - boolean isBuyOrder(Order)
+}
+
+class Trade {
+    - Order buyOrder
+    - Order sellOrder
+    - Investor buyer
+    - Investor seller
+    + Trade(Order buyOrder, Order sellOrder, Investor buyer, Investor seller)
+    + Order getBuyOrder(), getSellOrder()
+    + Investor getBuyer(), getSeller()
+}
+
+class StockExchange {
+    - static Map<String, StockExchange> exchanges
+    - String exchangeName
+    - Map<Stock, Integer> listedStocks
+    + static StockExchange getInstance(String exchangeName)
+    + void addStock(Stock stock)
+    + void executeOrder(Order order, Investor investor)
+    + void displayAllStock()
+    + void updateStockPrice(Stock stock, double newPrice)
+    + String getExchangeName(), void setExchangeName(String name)
+}
+
+enum OrderType {
+    MARKET_BUY, LIMIT_BUY, MARKET_SELL, LIMIT_SELL
+}
+
+enum OrderStatus {
+    PENDING, EXECUTED, INSUFFICIENT_STOCK, INSUFFICIENT_FUND
+}
+
+@enduml

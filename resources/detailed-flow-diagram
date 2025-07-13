@@ -1,0 +1,36 @@
+Investor
+   |
+   |  placeOrder()
+   v
+Broker
+   |
+   |  StockExchange.getInstance(exchange).executeOrder(order, investor)
+   v
+StockExchange
+   |
+   |  OrderProcessor.getInstance().processOrder(order, investor)
+   v
+OrderProcessor
+   |
+   |  OrderBook.getOrderBook(stock)
+   |
+   |  TradeMatchingEngine.getInstance().findMatch(order, investor, orderBook)
+   |
+   v
+TradeMatchingEngine
+   |
+   |  check matching condition
+   |  if match found -> return Trade object
+   |
+   v
+OrderProcessor
+   |
+   |  executeTrade(trade)
+   |     - validateFund()
+   |     - validateStock()
+   |     - update balances
+   |     - update portfolios
+   |     - update order status
+   |
+   v
+Investor portfolio updated + order marked EXECUTED
