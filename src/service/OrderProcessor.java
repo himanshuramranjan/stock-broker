@@ -1,22 +1,16 @@
-package model;
+package service;
 
 import enums.OrderStatus;
 import exception.InsufficientFundsException;
 import exception.InsufficientStockException;
-import service.TradeMatchingEngine;
+import exception.NoTradeFoundException;
+import model.*;
 
 public class OrderProcessor {
-    private static volatile OrderProcessor orderProcessor;
+    private static OrderProcessor orderProcessor = new OrderProcessor();
     private OrderProcessor() {}
 
     public static OrderProcessor getInstance() {
-        if(orderProcessor == null) {
-            synchronized (OrderProcessor.class) {
-                if(orderProcessor == null) {
-                    orderProcessor = new OrderProcessor();
-                }
-            }
-        }
         return orderProcessor;
     }
 
@@ -27,21 +21,24 @@ public class OrderProcessor {
         try {
             executeTrade(trade);
             System.out.println("Your trade has been processed successfully");
-        } catch (Exception e) {
+        } catch(NoTradeFoundException e) {
             System.out.println("Exception occurred while executing the trade " + e.getMessage());
-            orderBook.addOrder(trade.getBuyOrder());
-            orderBook.addOrder(trade.getSellOrder());
+            orderBook.addOrder(order);
+        } catch(Exception e) {
+            System.out.println("Exception occurred while executing the trade " + e.getMessage());
+            orderBook.addOrder(trade.buyOrder());
+            orderBook.addOrder(trade.sellOrder());
         }
     }
 
-    private void executeTrade(Trade trade) throws InsufficientStockException, InsufficientFundsException {
+    private void executeTrade(Trade trade) throws InsufficientStockException, InsufficientFundsException, NoTradeFoundException {
 
-        if(trade == null) throw new RuntimeException("Internal error, Trade not found");
+        if(trade == null) throw new NoTradeFoundException("No buyer or seller present at this moment for the trade, your order is added to the queue");
 
-        Order buyOrder = trade.getBuyOrder();
-        Order sellOrder = trade.getSellOrder();
-        Investor buyer = trade.getBuyer();
-        Investor seller = trade.getSeller();
+        Order buyOrder = trade.buyOrder();
+        Order sellOrder = trade.sellOrder();
+        Investor buyer = trade.buyer();
+        Investor seller = trade.seller();
 
         double totalCost = buyOrder.getPrice() * buyOrder.getQuantity();
         Stock stock = buyOrder.getStock();
