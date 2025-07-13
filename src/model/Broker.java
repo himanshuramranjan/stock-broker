@@ -2,38 +2,36 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Broker {
+    private static final Broker broker = new Broker();
+    private final String brokerName = "ZERODHA";
+    private final List<StockExchange> exchanges = new ArrayList<>();
+    private final List<Investor> investors = new ArrayList<>();
 
-    private static volatile Broker broker;
-    private static final List<StockExchange> exchanges = new ArrayList<>();
-    private final String brokerId;
-    private final String brokerName;
+    private Broker() {}
 
-    private Broker(String brokerName) {
-        this.brokerId = UUID.randomUUID().toString();
-        this.brokerName = brokerName;
-    }
-
-    public static Broker getInstance(String brokerName) {
-        if(broker == null) {
-            synchronized (Broker.class) {
-                if(broker == null) {
-                    broker = new Broker(brokerName);
-                }
-            }
-        }
+    public static Broker getInstance() {
         return broker;
     }
 
-    public static void addExchanges(List<String> exchangesName) {
-        for(String exchangeName : exchangesName) {
-            exchanges.add(StockExchange.getInstance(exchangeName));
-        }
+    public void addExchange(StockExchange exchange) {
+        exchanges.add(exchange);
     }
 
-    public static void placeOrder(Investor investor, Order order, String exchange) throws Exception {
+    public void addInvestor(Investor investor) {
+        investors.add(investor);
+    }
+
+    public void placeOrder(Investor investor, Order order, String exchange) {
         StockExchange.getInstance(exchange).executeOrder(order, investor);
+    }
+
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    public List<Investor> getInvestors() {
+        return investors;
     }
 }
