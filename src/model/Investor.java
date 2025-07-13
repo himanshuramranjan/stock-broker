@@ -8,24 +8,22 @@ public class Investor {
     private double totalBalance;
     private String userName;
     private String email;
-    private Broker broker;
 
-    public Investor(String userId, double totalBalance, String userName, String email, Broker broker) {
+    public Investor(String userId, double totalBalance, String userName, String email) {
         this.userId = userId;
         this.portfolio = new Portfolio(userId);
         this.totalBalance = totalBalance;
         this.userName = userName;
         this.email = email;
-        this.broker = broker;
     }
 
     public void updateBalance(double balance) {
         this.totalBalance += balance;
     }
 
-    public void placeOrder(OrderType type, Stock stock, int quantity, double price, String exchange) throws Exception {
-        Order order = new Order(type, stock, quantity, price);
-        broker.placeOrder(this, order, exchange);
+    public void placeOrder(OrderType type, Stock stock, int quantity, Double price, String exchange) {
+        Order order = new Order(this, type, stock, quantity, price);
+        Broker.getInstance().placeOrder(this, order, exchange);
     }
 
     public String getUserName() {
@@ -50,9 +48,5 @@ public class Investor {
 
     public Portfolio getPortfolio() {
         return portfolio;
-    }
-
-    public Broker getBroker() {
-        return broker;
     }
 }
