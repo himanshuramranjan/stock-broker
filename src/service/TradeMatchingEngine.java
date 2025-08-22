@@ -8,7 +8,7 @@ import model.Trade;
 
 import java.util.PriorityQueue;
 import java.util.function.BiPredicate;
-
+// Note : In real world this engine sits in Exchange rather at broker end
 public class TradeMatchingEngine {
     private static final TradeMatchingEngine tradeMatchingEngine = new TradeMatchingEngine();
 
