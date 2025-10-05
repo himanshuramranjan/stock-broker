@@ -7,7 +7,7 @@ import exception.NoTradeFoundException;
 import model.*;
 
 public class OrderProcessor {
-    private static OrderProcessor orderProcessor = new OrderProcessor();
+    private static final OrderProcessor orderProcessor = new OrderProcessor();
     private OrderProcessor() {}
 
     public static OrderProcessor getInstance() {
