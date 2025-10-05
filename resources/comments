@@ -53,3 +53,7 @@ Unmatched buy quantity (if any) may also remain or be cancelled
 
 
 > Also we can add the validity for which current order should be valid (like for a day or month)
+
+> In portfolio the map can be of Map<String, StockHolding>
+where each holding stands for the individual buy (with explicit price,
+qty and time) to get a detailed view of the holdings
