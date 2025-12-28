@@ -22,7 +22,7 @@ public class OrderProcessor {
             executeTrade(trade);
             System.out.println("Your trade has been processed successfully");
         } catch(NoTradeFoundException e) {
-            System.out.println("Exception occurred while executing the trade " + e.getMessage());
+            System.out.println("No matching trade found, order is in Q" + e.getMessage());
             orderBook.addOrder(order);
         } catch(Exception e) {
             System.out.println("Exception occurred while executing the trade " + e.getMessage());
